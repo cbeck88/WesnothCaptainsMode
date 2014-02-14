@@ -1,0 +1,167 @@
+#Modify these lines to change the schedule of picks / bans and what hexes are associated to each choice.
+#Best to set so that p2 picks last, so that p1 gets to pick map.
+#define CAP_6_SCHEDULE_Player
+    2,1,2,1,  2,1,1,2,  2,1,2,1,   1,2,1,2,  2,1,2,1,   1,2,1,2
+#enddef
+#define CAP_6_SCHEDULE_isBan
+    yes,yes,yes,yes,no,no,no,no,yes,yes,yes,yes,no,no,no,no,yes,yes,yes,yes,no,no,no,no
+#enddef
+#define CAP_6_SCHEDULE_X
+    13,11,14,10, 19,5,5,19, 15,9,15, 9,  5,19,5,19,  15, 9,14,10 ,  6,18,7,17
+#enddef
+#define CAP_6_SCHEDULE_Y
+    5, 5,5, 5,   6, 6,7,7,   6, 6,7,7,  8, 8, 9,9,   8, 8, 8,8,    9, 9, 10, 10
+#enddef
+#define CAP_6_STRINGS
+1st Ban Phase, 1st Pick Phase, 2nd Ban Phase, 2nd Pick Phase, Final Ban Phase, Final Pick Phase
+#enddef
+
+#Modify these lines to change the moderator / where he stands
+#define MODERATOR_TYPE
+    Armageddon Drake
+#enddef
+
+#define MOD_X
+    12
+#enddef
+
+#define MOD_Y
+    2
+#enddef
+
+#Modify these lines to change where and in what colors the schedule listing appears
+#define LIST_LOC_X
+    1
+#enddef
+#define LIST_LOC_Y
+    1
+#enddef
+#define LIST_COLOR
+    128,128,255
+#enddef
+#define LIST_COLOR_HIGHLIGHTED
+    255,0,0
+#enddef
+
+#redefine move_anim so that they walk along bridge if they are banned
+#define CAP6_MOVE_UNIT_ANIM
+    {IF_VAR SCHED_B[$PICK_CTR].val boolean_equals false (
+        [then]
+            [move_unit]
+                x,y = $x1, $y1
+                to_x = $SCHED_X[$PICK_CTR].val
+                to_y = $SCHED_Y[$PICK_CTR].val
+                check_passability = no
+            [/move_unit]
+        [/then]
+        [else]
+            {IF_VAR SCHED_P[$PICK_CTR].val equals 1 (
+                [then]
+                    [move_unit]
+                        x,y = $x1, $y1
+                        to_x = 6,8,12,$SCHED_X[$PICK_CTR].val
+                        to_y = 5,10,10,$SCHED_Y[$PICK_CTR].val
+                        check_passability=no
+                    [/move_unit]
+                [/then]
+                [else]
+                    [move_unit]
+                        x,y = $x1,$y1
+                        to_x = 18,16,12,$SCHED_X[$PICK_CTR].val
+                        to_y = 5,10,10,$SCHED_Y[$PICK_CTR].val
+                        check_passability=no
+                    [/move_unit]
+                [/else]
+            )}
+        [/else]
+    )}
+#enddef
+
+#Here we override the "ban_anim" macro to get the saurian oracle animation, which stands at 12,6 (see below)
+#define CAP6_BAN_ANIM
+    [harm_unit]
+        [filter]
+            x=$SCHED_X[$PICK_CTR].val
+            y=$SCHED_Y[$PICK_CTR].val
+        [/filter]
+        [filter_second]
+            x=12
+            y=6
+        [/filter_second]
+        amount = 4
+        damage_type = impact
+        kill=no
+        animate = yes
+        petrified =yes
+        experience = no
+    [/harm_unit]
+#enddef
+
+[multiplayer]
+    id=multiplayer_Captains_Mode_6
+    name= _ "2p - Captains Mode 6"
+    {DESCRIPTION_AND_OBJECTIVES}
+    map_data="{~add-ons/Captains_Mode/resources/2p_Captains_Mode_6.map}"
+    random_start_time=no
+
+    {DUSK}
+    {DEFAULT_MUSIC_PLAYLIST}
+
+    [event]
+        name = prestart
+        [unit]
+            side = 3
+            type = Saurian Oracle
+            x=12
+            y = 6
+            name = "Zasz the Jester"
+        [/unit]
+    [/event]
+
+    [event]
+        name = prestart
+        {CAPTAINS_PRESTART CAP_6_SCHEDULE_Player CAP_6_SCHEDULE_isBan CAP_6_SCHEDULE_X CAP_6_SCHEDULE_Y CAP_6_STRINGS}
+    [/event]
+    [event]
+        name=start
+        {MODERATOR_GREETING}
+    [/event]
+    [event]
+        name = recruit
+        first_time_only = no
+
+        {CAPTAINS_RECRUIT CAP6_MOVE_UNIT_ANIM CAP6_BAN_ANIM DEFAULT_PICK_ANIM}
+    [/event]
+    [event]
+        name = side turn
+        first_time_only = no
+
+        {DRAW_LIST}
+        {CAPTAINS_SIDE_TURN}
+    [/event]
+
+    [side]
+        {SIDE_DEFAULTS 1}
+        colour=red
+        team_name=Red
+        user_team_name= _ "teamname^Red"
+    [/side]
+    [side]
+        {SIDE_DEFAULTS 2}
+        colour=blue
+        team_name=Blue
+        user_team_name= _ "teamname^Blue"
+    [/side]
+    [side]
+        id=Moderator
+        side = 3
+        persistent=no
+        colour=brown
+        controller=ai
+        allow_player=false
+        canrecruit=no
+        shroud=no
+        fog=no
+        gold = 0
+    [/side]
+[/multiplayer]

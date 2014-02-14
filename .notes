@@ -1,0 +1,34 @@
+Data types: Schedule is an array of "Picks". A pick consists of a field saying who it is for, whether it is
+ban or pick, and its x, y coordinates on the map.
+
+Unit Pool is a collection of unit types which are eligible. How to popluate this automatically?
+
+Event logic: (with dialogs?)
+
+Start of each turn: If no picks made yet, then first player selects a map pool.
+Otherwise, check if next pick is for the the current player. 
+
+If so initiate a PICK dialog, informing the player that it is their pick turn and what type it is. Afterwards, remove this unit, increment the pick counter, and if it was a pick add it to their list...
+
+
+Event logic: (with built in recruit dialog)
+
+- Leader has keep with one recruit hex and 1,000,000 gold.
+- On Prestart, label the map : 1: P1 ban, 2: P2 ban, 3: P3 pick, initialize pick list and counter variable
+- On turn start: 
+	If there are still picks to go: 
+		If it is not my pick, end turn.
+	If there are not still picks to go,
+		Signal that picks have ended.
+		Set both sides recruits to be the picks arrays they have.
+		Query the map pool.
+		Prepare an "on end turn end level" event. 
+		(This is to make sure the last selection gets seen by opponent.)
+- On prerecruit:
+	If there are still picks to go:
+		The *second unit* is selected, 
+			moved to the destination location,
+			stone it if it is a ban 
+			added to the appropriate pick array if it is a pick and not a ban, 
+			and removed from both sides current recruit list.
+		The turn is ended.

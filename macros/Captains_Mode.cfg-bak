@@ -39,7 +39,7 @@ On your turn, recruit the unit that you wish to pick / ban. Banned units will ap
     [label]
         x = {LIST_LOC_X}
         y = {LIST_LOC_Y}
-        text =_  "Draft Schedule:"
+        text =_  "Pick Schedule:"
     [/label]
 
     {VARIABLE phase_start 0}
@@ -182,7 +182,6 @@ On your turn, recruit the unit that you wish to pick / ban. Banned units will ap
     {VARIABLE PICK_CTR 0}
     {VARIABLE numpicked1 0}
     {VARIABLE numpicked2 0}
-    {VARIABLE next_scen ""}
 
     #{SCHEDULE_INIT}
     [set_variables]
@@ -300,7 +299,7 @@ On your turn, recruit the unit that you wish to pick / ban. Banned units will ap
             {VARIABLE picked_type $picked_unit.type}
             [disallow_recruit]
                 type = $picked_type
-                side = 1,2,3,4,5,6,7,8
+                side = 1,2
             [/disallow_recruit]
             {IF_VAR SCHED_B[$PICK_CTR].val boolean_equals true (
                 [then]
@@ -339,6 +338,7 @@ On your turn, recruit the unit that you wish to pick / ban. Banned units will ap
 #enddef
 
 #define QUERY_NEXT_SCEN
+    {VARIABLE next_scen ""}
     [while]
         {VARIABLE_CONDITIONAL next_scen equals ""}
         [do]
@@ -365,7 +365,9 @@ Also this scenario should have save_id's in RBY format."
                             [text_input]
                                 variable = next_scen
                                 label = _ "Scenario ID"
+                                #wmllint:Start ignoring
                                 text =  "RBY Hamlets 12"
+                                #wmllint:Stop ignoring
                                 max_length = 40
                             [/text_input]
                         [/message]
@@ -375,7 +377,7 @@ Also this scenario should have save_id's in RBY format."
         [/do]
     [/while]
     [print]
-        text =_  "Will move to " + $next_scen + " at finish."
+        text =_  "Will move to " + $next_scen + " when P1 ends turn."
         size=20
         duration=750
         red,green,blue=0,255,0
@@ -463,10 +465,6 @@ Also this scenario should have save_id's in RBY format."
     fog=no
     gold=800
     income=20
-    team_lock = yes
-    gold_lock = yes
-    income_lock = yes
-    share_view = yes
     [ai]
         villages_per_scout=8
     [/ai]
